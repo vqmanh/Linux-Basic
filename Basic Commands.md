@@ -67,7 +67,7 @@ VD:
 
 - Mỗi file có một và chỉ một inode.
 - Mỗi inode cũng chỉ có một số inode duy nhất.
-- Nhưngmột file có thể có nhiều tên file tùy theo số hard link trỏ đến nó.
+- Nhưng một file có thể có nhiều tên file tùy theo số hard link trỏ đến nó.
 
 
 **Đối với Hard links: là một liên kết (link) trỏ đến vị trí lưu một file trên ổ cứng:**
@@ -92,7 +92,7 @@ VD:
 - Ví dụ file gốc passwd có đường dẫn là /etc/passwd. Trong thư mục /home/zxc tạo một soft link đặt tên là “mậtkhẩu” trỏ đến file đó. Như vậy đường dẫn mới đến file /etc/passwd là /home/zxc/mậtkhẩu. Khi truy cập đến một trong hai đường dẫn trên đều là truy cập đến file passwd.
 - Nếu đổi tên, xóa hoặc chuyển file gốc sang thư mục khác thì soft link mất tác dụng, không truy cập được đến file đó nữa. Khác với hard link, khi xóa file có soft link, file bị xóa thật.
  Có thể tạo soft link với thư mục và file nằm trên partition khác.
- 
+
 <img src=https://imgur.com/4OoZ89G.jpg>
 
 <img src=https://imgur.com/gtDHLx2.jpg>
