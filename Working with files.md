@@ -84,6 +84,8 @@ head|Theo mặc định, nó in 10 dòng đầu tiên của tệp
 
 ## So sánh các tập tin
 
+`diff tên_file_1 tên_file_2`
+
 <img src=https://imgur.com/DtbOxdV.jpg>
 
 
