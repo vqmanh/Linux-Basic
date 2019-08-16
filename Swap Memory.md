@@ -55,3 +55,5 @@ Bước 4: Thiết lập swap tự động được kích hoạt mỗi khi reboo
 `echo /swapfile none swap defaults 0 0 >> /etc/fstab`
 
 hoặc `echo /swapfile none swap defaults 0 0 | sudo tee -a /etc/fstab`
+
+Sau đó sử dụng lệnh `swapon -a`
