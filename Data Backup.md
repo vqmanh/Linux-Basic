@@ -139,7 +139,7 @@ Dùng để dùng để sao lưu dữ liệu, copy, chuyển đổi dữ liệu 
 
 - đích ở đây là ổ đĩa, thư mục, file ta muốn lưu data vào đó.
 
-Các tùy chọn ta cơ bản:
+**Các tùy chọn ta cơ bản:**
 
 - bs=byte quá trình đọc ghi bao nhiêu bytes 1 lần
 

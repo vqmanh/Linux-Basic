@@ -123,11 +123,11 @@ Sau đó reboot rồi sử dụng `hostnamectl` để kiểm tra
 - PPID – Process Parent ID. ID của process mà khởi động process này.
 - 2 commands phổ biến nhất được dùng là xem processes là `top` và `ps`. Khác biệt là top được dùng để tương tác nhiều còn ps được dùng trong scripts, kết hợp với các lệnh bash khác hoặc tương tự.
 
-`top` – command top là đơn giản và phổ biến nhất để hiển thị những process chiếm nhiều tài nguyên máy tính nhất.  Khi thực hiện command  top trong terminal, chúng ta sẽ thấy cửa sổ tương tự như sau:
+**`top` – command `top` là đơn giản và phổ biến nhất để hiển thị những process chiếm nhiều tài nguyên máy tính nhất.  Khi thực hiện command  top trong terminal, chúng ta sẽ thấy cửa sổ tương tự như sau:**
 
 <img src=https://imgur.com/Kbm3Cdy.jpg>
 
-**`top` là ứng dụng, sau khi thực hiện lệnh, một layout hiện lên và danh sách process đang liên tục được cập nhật mỗi giây. Layout mới này có thể tương tác với bàn phím.**
+`top` là ứng dụng, sau khi thực hiện lệnh, một layout hiện lên và danh sách process đang liên tục được cập nhật mỗi giây. Layout mới này có thể tương tác với bàn phím.
  Ví dụ:
 
 - h or ? – Hiện cửa sổ help với các câu lệnh hữu dụng
