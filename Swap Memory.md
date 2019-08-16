@@ -53,3 +53,5 @@ Bước 3: Thiết lập phân vùng swap trên tệp. Sử dụng lệnh sau:
 Bước 4: Thiết lập swap tự động được kích hoạt mỗi khi reboot
 
 `echo /swapfile none swap defaults 0 0 >> /etc/fstab`
+
+hoặc `echo /swapfile none swap defaults 0 0 | sudo tee -a /etc/fstab`
