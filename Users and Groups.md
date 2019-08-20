@@ -32,6 +32,31 @@ VD: xóa user - `userdel tên_user`
 
 *Tuy nhiên, thư mục người dùng vẫn sẽ còn trên /home. Điều này có thể hữu ích nếu nó là xóa tạm thời. Để xóa thư mục chính trong khi xóa tài khoản, ta cần sử dụng `userdel -r tên_user`.*
 
+## THAM KHẢO
+```
+Lệnh tạo user: useradd + tên
+Lệnh tạo pass cho user: passwd [tên user]
+Mỗi user sẽ có 1 ID (gọi là UDI)                                          
+User root có ID = 0
+Tất cả user được tạo ra đều được coi là Regular User (user thường)
+Thông thường khi user được tạo sẽ có id= 1000
+Kiểm tra user đã được tạo chưa: cat /etc/passwd
+Lệnh đăng nhập vào user: su [tên user]
+Xóa user: userdel  –r  [tên user]
+Tạo Group: groupadd [tên group]
+Mỗi group sẽ có 1 ID ( gọi là GID). Mặc định nhóm root có ID=0
+Kiểm tra group đã dc tạo chưa: cat /etc/group
+Gán user và nhóm: usermod –aG [tên nhóm] [tên user]
+Kiểm tra user có trong group chưa: lid –g [tên nhóm]
+Xóa group: groupdel [tên group]
+Ta có thể khóa tài khoản người dùng: passwd –l [tên user] 
+Mở khóa user: passwd –u [tên user]	
+Lệnh kiểm tra hạn của user: chage –l [tên user]
+Cú pháp kiểm tra 90 ngày nữa là ngày bn: date –d “+90 days”
+Gia hạn cho user: chage –E [năm-tháng-ngày] [tên user]
+Thay đổi số ngày thông báo thay đổi pass User: Chage –W [số ngày] [tên user]
+```
+
 **Lệnh `id` cung cấp thông tin về người dùng hiện tại.**
 
 ```
