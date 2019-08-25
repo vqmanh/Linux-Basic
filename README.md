@@ -10,7 +10,7 @@
 #### 8. [Swap Memory](https://github.com/vqmanh/Linux-Basic/blob/master/Swap%20Memory.md)
 #### 9. [User Envinronment](https://github.com/vqmanh/Linux-Basic/blob/master/Users%20and%20Groups.md)
 #### 10. [Processes](https://github.com/vqmanh/Linux-Basic/blob/master/Linux%20processes.md)
-#### 11. [Volume Manager Basics]()
+#### 11. [Volume Manager Basics](https://github.com/vqmanh/Linux-Basic/blob/master/Volume%20Manager%20Basics.md)
 #### 12. [Advanced Volume Manager]()
 #### 13. [Networking]()
 #### 14. [Network File System]()
