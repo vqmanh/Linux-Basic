@@ -56,3 +56,22 @@ Và tắt firewalld: `systemctl stop firewalld`
 [root@vqmanh ~]# mkdir -p /mnt/nfs
 [root@vqmanh ~]# mount 66.0.0.199:/var/shared /mnt/nfs
 ```
+Các bạn có thể kiểm tra với lệnh 
+```
+[root@vqmanh ~]# showmount -e
+Export list for vqmanh:
+/var/shared 66.0.0.0/24
+```
+
+```
+[root@thuctap ~]# df -h
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/mapper/centos-root   20G   20G   70M 100% /
+devtmpfs                 899M     0  899M   0% /dev
+tmpfs                    910M     0  910M   0% /dev/shm
+tmpfs                    910M  9.6M  901M   2% /run
+tmpfs                    910M     0  910M   0% /sys/fs/cgroup
+/dev/sda1                509M  176M  334M  35% /boot
+tmpfs                    182M     0  182M   0% /run/user/0
+66.0.0.199:/var/shared    20G   20G   70M 100% /mnt/nfs
+```
