@@ -6,6 +6,16 @@
 
 - Trên máy khách, nếu muốn hệ thống tệp từ xa được gắn tự động khi khởi động hệ thống, tệp /etc/fstab sẽ được sửa đổi để thực hiện việc này. Ví dụ, một mục trong tệp `/etc/fstab` của khách hàng: `<servername>:/shared /mnt/nfs/shared nfs defaults 0 0`. Bạn cũng có thể gắn hệ thống tập tin từ xa mà không cần khởi động lại hoặc dưới dạng gắn kết một lần bằng cách sử dụng trực tiếp lệnh `mount`.
 
+- NFS được phát triển bởi SUN Microsystem, bắt đầu từ năm 1984 với phiên bản đầu tiên.
+    Cho đến nay đã có tất cả 6 phiên bản:
+    - version 1: phát hành năm 1984 với mục đích thí nghiệm
+    - version 2: phát hành năm 1989, được đưa ra thị trường
+    - version 3: phát hành năm 1995 với nhiều cải tiến
+    - version 4 năm 2000, version 4.1 năm 2010 và version 4.2 năm 2016
+- Dung lượng file mà NFS cho phép client truy cập lớn hơn 2GB
+- Truyền thông giữa client và server thực hiện qua mạng Ethernet
+- Client và Server sử dụng RPC (Remote Procedure Call) để giao tiếp với nhau.
+- NFS sử dụng cổng 2049    
 ## Thực hành
 
 ### Bước 1: Cài đặt `nfs` trên máy chủ
@@ -75,3 +85,35 @@ tmpfs                    910M     0  910M   0% /sys/fs/cgroup
 tmpfs                    182M     0  182M   0% /run/user/0
 66.0.0.199:/var/shared    20G   20G   70M 100% /mnt/nfs
 ```
+**Sử dụng `nfssat -s`** Nfsstat hiển thị số liệu thống kê lưu về hoạt động của máy khách và máy chủ NFS.
+````
+[root@thuctap ~]#  nfsstat –s
+Server rpc stats:
+calls      badcalls   badclnt    badauth    xdrcall
+0          0          0          0          0
+
+Client rpc stats:
+calls      retrans    authrefrsh
+157        0          156
+
+Client nfs v4:
+null         read         write        commit       open         open_conf
+0         0% 0         0% 0         0% 0         0% 0         0% 0         0%
+open_noat    open_dgrd    close        setattr      fsinfo       renew
+0         0% 0         0% 0         0% 0         0% 6         6% 0         0%
+setclntid    confirm      lock         lockt        locku        access
+0         0% 0         0% 0         0% 0         0% 0         0% 4         4%
+getattr      lookup       lookup_root  remove       rename       link
+6         6% 5         5% 2         2% 0         0% 0         0% 0         0%
+symlink      create       pathconf     statfs       readlink     readdir
+0         0% 0         0% 4         4% 1         1% 0         0% 0         0%
+server_caps  delegreturn  getacl       setacl       fs_locations rel_lkowner
+10       10% 0         0% 0         0% 0         0% 0         0% 0         0%
+secinfo      exchange_id  create_ses   destroy_ses  sequence     get_lease_t
+0         0% 0         0% 2         2% 3         3% 1         1% 50       50%
+reclaim_comp layoutget    getdevinfo   layoutcommit layoutreturn getdevlist
+1         1% 2         2% 0         0% 0         0% 0         0% 0         0%
+(null)
+2         2%
+
+````
