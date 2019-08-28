@@ -1,119 +1,104 @@
-# Hệ thống tập tin mạng
+# NFS (Network File System)
 
-- NFS (the Network File System) là một trong những phương pháp được sử dụng để chia sẻ dữ liệu trên các hệ thống vật lý. Nhiều quản trị viên hệ thống gắn các thư mục `home` của người dùng từ xa trên một máy chủ để cấp cho họ quyền truy cập vào cùng một tệp và tệp cấu hình trên nhiều hệ thống máy khách. Điều này cho phép người dùng đăng nhập vào các máy khác nhau nhưng vẫn có quyền truy cập vào cùng các tệp và tài nguyên.
+## Nội dung 
 
-- Trên một bản phân phối Linux chung, trình nền máy chủ NFS thường được bắt đầu bằng lệnh `service nfs start`. Tệp `/etc/exports` này chứa các thư mục và quyền mà máy chủ lưu trữ sẵn sàng chia sẻ với các hệ thống khác qua NFS. Một mục trong tập tin này có thể là `/shared *(rw)`. Mục này cho phép thư mục  `/shared` được gắn kết bằng NFS với quyền đọc và ghi `(rw)` và được chia sẻ với các máy chủ khác trong cùng miền. Sau khi sửa đổi tệp `/etc/exports`, bạn có thể sử dụng lệnh `exportfs -av` để thông báo cho Linux về các thư mục bạn cho phép được gắn từ xa bằng NFS.
+[A. Tổng quan về NFS](#A)
 
-- Trên máy khách, nếu muốn hệ thống tệp từ xa được gắn tự động khi khởi động hệ thống, tệp /etc/fstab sẽ được sửa đổi để thực hiện việc này. Ví dụ, một mục trong tệp `/etc/fstab` của khách hàng: `<servername>:/shared /mnt/nfs/shared nfs defaults 0 0`. Bạn cũng có thể gắn hệ thống tập tin từ xa mà không cần khởi động lại hoặc dưới dạng gắn kết một lần bằng cách sử dụng trực tiếp lệnh `mount`.
+- [A1. Một số khái niệm](#A1)
 
-- NFS được phát triển bởi SUN Microsystem, bắt đầu từ năm 1984 với phiên bản đầu tiên.
-    Cho đến nay đã có tất cả 6 phiên bản:
-    - version 1: phát hành năm 1984 với mục đích thí nghiệm
-    - version 2: phát hành năm 1989, được đưa ra thị trường
-    - version 3: phát hành năm 1995 với nhiều cải tiến
-    - version 4 năm 2000, version 4.1 năm 2010 và version 4.2 năm 2016
-- Dung lượng file mà NFS cho phép client truy cập lớn hơn 2GB
-- Truyền thông giữa client và server thực hiện qua mạng Ethernet
-- Client và Server sử dụng RPC (Remote Procedure Call) để giao tiếp với nhau.
-- NFS sử dụng cổng 2049    
-## Thực hành
+- [A2. Cách hoạt động](#A2)
 
-### Bước 1: Cài đặt `nfs` trên máy chủ
+- [A3. Các phiên bản](#A3)
 
- `yum install -y nfs-utils nfs-utils-lib`
+- [A4. Ưu nhược điểm](#A4)
 
-### Bước 2: Tạo thư mục chia sẻ chung
 
-`[root@vqmanh ~]#  mkdir /var/shared`
+[B. LAB](#B)
 
-### Bước 3: Chỉnh sửa file `/etc/exports`
+- [B1. Mô hình](#B1)
+- [B2. IP Planing](#B2)
+- [B3. Triển khai](#B3)
 
-```
-[root@vqmanh ~]# vi /etc/exports
-/var/shared 66.0.0.0/24(no_root_squash,no_all_squash,rw,sync)
-```
-- **Trong đó:**
+<a name = "A"></a>
+## A. Tổng quan về NFS
 
-    - `/var/shared` là thư mục dùng chung
-    - `66.0.0.0/24` là dải địa chỉ IP của khách hàng
+- NFS là một trong những phương pháp được sử dụng để chia sẻ dữ liệu trên các hệ thống vật lý. Được phát triển bởi SunMicrosystems và năm 1984, cho phép người dùng xem, tùy chọn lưu trữ và cập nhật trên máy tính từ xa.
+- NFS là hệ thống cung cấp dịch vụ chia sẻ file phổ biến trong hệ thống mạng Linux và Unix.
+- NFS cho phép các máy tính kết nối tới 1 phân vùng đĩa trên 1 máy từ xa giống như là local disk. Cho phép việc truyền file qua mạng được nhanh và trơn tru hơn.
+- NFS sử dụng mô hình Client/Server. Trên server có các disk chứa các file hệ thống được chia sẻ và một số dịnh vụ chạy ngầm (daemon) phục vụ cho việc chia sẻ với Client.
+- Cung cấp chức năng bảo mật file và quản lý lưu lượng sử dụng (file system quota).
 
-    - `rw` cho phép client đọc ghi với thư mục
-    - `ro` quyền chỉ đọc với thư mục
-    - `sync` đồng bộ hóa thư mục dùng chung
-    - `root_squash` ngăn remote root users
-    - `no_root_squash` cho phép remote root users
+- Khi triển khai hệ thống lớn hoặc chuyên biệt cần áp dụng 3NFS, còn người dùng ngẫu nhiên hoặc nhỏ lẻ thì áp dụng 2NFS, 4NFS.
+- Với NFSv4, yêu cầu hệ thống phải có kernel phiên bản từ 2.6 trở lên
 
-*Chú ý: Khi khai báo quyền truy cập của client ta cần viết liền*
+- Client từ phiên bản kernel 2.2.18 trở đi đều hỗ trợ NFS trên nền TCP
 
-### Bước 4: Khởi động dịch vụ
+<a name = "A1"></a>
+### A1. Một số khái niệm
 
-```
-[root@vqmanh ~]# systemctl start rpcbind
-[root@vqmanh ~]# systemctl start nfs-server
-[root@vqmanh ~]# systemctl enable rpcbind
-[root@vqmanh ~]# systemctl enable nfs-server
-Created symlink from /etc/systemd/system/multi-user.target.wants/nfs-server.service to /usr/lib/systemd/system/nfs-server.service.
-```
-Và tắt firewalld: `systemctl stop firewalld`
+- **Virtual filesystem (VFS)** là một kỹ thuật tự động chuyển hướng tất cả các truy xuất đến NFS-mount file một cách thông suốt trên Remote Server. 
 
-### Bước 5: Trên máy client, cài dịch vụ `nfs`
+- **Stateless Operation** là những chương trình đọc và ghi tập tin trên hệ thống tập tin cục bộ dựa vào hệ thống để theo dõi và ghi nhận vị trí đọc dữ liệu thông qua con trỏ địa chỉ pointer. 
+- **Caching** trên NFS Client để lưu lại một số dữ liệu cần thiết vào hệ thống cục bộ. 
+- **NFS Background Mounting** chỉ định khoảng thời gian đợi với tham số gb trong trường hợp Remote Server không tồn tại. 
+- **Hard and Soft Mounts** có ý nghĩa rằng quá trình mount file luôn được tiến hành và quá trình sử dụng RPC để mount remote file system. 
 
-`yum install -y nfs-utils nfs-utils-lib`
+<a name = "A2"></a>
+### A2. Cách hoạt động
 
-### Bước 6: Tạo thư mục, sau đó `mount` thư mục được chia sẻ
+- Để truy cập dữ liệu được lưu trữ trên 1 máy chủ, server sẽ triển khai các quy trình nền NFS để cung cấp dữ liệu cho khách hàng. Quản trị viên máy chủ xác định những gì cần cung cấp và đảm bảo có thể nhận ra các máy khách được xác nhận.
+Từ client, yêu cầu quyền truy cập vào dữ liệu đã xuất, bằng cách sử dụng lệnh `mount`.
 
-```
-[root@vqmanh ~]# mkdir -p /mnt/nfs
-[root@vqmanh ~]# mount 66.0.0.199:/var/shared /mnt/nfs
-```
-Các bạn có thể kiểm tra với lệnh 
-```
-[root@vqmanh ~]# showmount -e
-Export list for vqmanh:
-/var/shared 66.0.0.0/24
-```
+- Server NFS tham chiếu tệp cấu hình `/etc/export` để xác định xem máy khách có được phép truy cập vào bất kỳ hệ thống nào không. Sau khi xác minh, tất cả hoạt động tập tin và thư mục được phép sử dụng trên Client. 
 
-```
-[root@thuctap ~]# df -h
-Filesystem               Size  Used Avail Use% Mounted on
-/dev/mapper/centos-root   20G   20G   70M 100% /
-devtmpfs                 899M     0  899M   0% /dev
-tmpfs                    910M     0  910M   0% /dev/shm
-tmpfs                    910M  9.6M  901M   2% /run
-tmpfs                    910M     0  910M   0% /sys/fs/cgroup
-/dev/sda1                509M  176M  334M  35% /boot
-tmpfs                    182M     0  182M   0% /run/user/0
-66.0.0.199:/var/shared    20G   20G   70M 100% /mnt/nfs
-```
-**Sử dụng `nfssat -s`** Nfsstat hiển thị số liệu thống kê lưu về hoạt động của máy khách và máy chủ NFS.
-````
-[root@thuctap ~]#  nfsstat –s
-Server rpc stats:
-calls      badcalls   badclnt    badauth    xdrcall
-0          0          0          0          0
+<a name = "A3"></a>
+### A3. Các phiên bản
 
-Client rpc stats:
-calls      retrans    authrefrsh
-157        0          156
+- NFSv2: Tháng 3 năm 1989
+    - Có thể sử dụng cả TCP và UDP qua mạng IP (cổng 2049)
+    - Ban đầu chỉ hoạt động trên UDP
+- NFSv3: Tháng 6 năm 1995
+    - An toàn và mạnh mẽ hơn khi xử lý lỗi so với v2
+    - Sử dụng cả TCP và UDP qua cổng 2049
+    - Vẫn là phiên bản được sử dụng rộng rãi nhất
+- NFSv4: Tháng 4 năm 2003
+    - Hoạt động thông qua tường lửa và trên internet
+    - Hỗ trợ ACL (Danh sách các câu lệnh chỉ ra loại packet nào được chấp nhận, hủy bỏ dựa vào địa chỉ nguồn, đích hoặc số port)
+    - Sử dụng giao thức TCP là bắt buộc
+- NFSv4.1: Tháng 1 năm 2010
+    - Khả năng cung cấp quyền truy cập song song có thể mở rộng vào các tệp được phân phối giữa nhiều máy chủ
+- NFSv4.2: Tháng 11 năm 2016
+    - Sao chép và sao chép phía máy chủ
+    - Một lợi thế lớn của NFSv4 so với các phiên bản trước đó là chỉ có một cổng IP được sử dụng để chạy dịch vụ, giúp đơn giản hóa việc sử dụng giao thức trên tường lửa.
 
-Client nfs v4:
-null         read         write        commit       open         open_conf
-0         0% 0         0% 0         0% 0         0% 0         0% 0         0%
-open_noat    open_dgrd    close        setattr      fsinfo       renew
-0         0% 0         0% 0         0% 0         0% 6         6% 0         0%
-setclntid    confirm      lock         lockt        locku        access
-0         0% 0         0% 0         0% 0         0% 0         0% 4         4%
-getattr      lookup       lookup_root  remove       rename       link
-6         6% 5         5% 2         2% 0         0% 0         0% 0         0%
-symlink      create       pathconf     statfs       readlink     readdir
-0         0% 0         0% 4         4% 1         1% 0         0% 0         0%
-server_caps  delegreturn  getacl       setacl       fs_locations rel_lkowner
-10       10% 0         0% 0         0% 0         0% 0         0% 0         0%
-secinfo      exchange_id  create_ses   destroy_ses  sequence     get_lease_t
-0         0% 0         0% 2         2% 3         3% 1         1% 50       50%
-reclaim_comp layoutget    getdevinfo   layoutcommit layoutreturn getdevlist
-1         1% 2         2% 0         0% 0         0% 0         0% 0         0%
-(null)
-2         2%
+<a name = "A4"></a>
+### **A4. Ưu nhược điểm**
+- **Ưu điểm:**
 
-````
+    - NFS là 1 giải pháp chi phí thấp để chia sẻ tệp mạng.
+    - Dễ cài đặt vì nó sử dụng cơ sở hạ tầng IP hiện có.
+    - Cho phép quản lý trung tâm, giảm nhu cầu thêm phần mềm cũ và dụng lượng đĩa trên các hệ thống người dùng cá nhân.
+- **Nhược điểm:**
+
+    - NFS vốn không an toàn, chỉ nên sử dụng trên 1 mạng đáng tin cậy sau Firewall.
+    - NFS bị chậm trong khi lưu lượng mạng lớn.
+    - Client và server tin tưởng lần nhau vô điều kiện.
+    - Tên máy chủ có thể là giả mạo (tự xưng là máy khác).
+
+<a name = "B"></a>
+## B. LAB
+<a name = "B1"></a>
+### B1. Mô hình
+
+<img src=https://imgur.com/GaTE1sc.jpg>
+
+<a name = "B2"></a>
+### B2. IP Planing
+
+Tên máy ảo|	Hệ điều hành|	IP address|	Subnet mask|	Default gateway
+------|-----|----------|--------|-----
+NFS Server| CentOS7|66.0.0.199|/24|66.0.0.1
+Client|CentOS7|66.0.0.200|/24|66.0.0.1
+
+<a name = "B3"></a>
+### B3. Triển khai
