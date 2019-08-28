@@ -51,6 +51,14 @@ Từ client, yêu cầu quyền truy cập vào dữ liệu đã xuất, bằng 
 
 - Server NFS tham chiếu tệp cấu hình `/etc/export` để xác định xem máy khách có được phép truy cập vào bất kỳ hệ thống nào không. Sau khi xác minh, tất cả hoạt động tập tin và thư mục được phép sử dụng trên Client. 
 
+- NFS sử dụng thủ tục RPC (Remote Procedure Calls) để gửi, nhận yêu cầu giữa máy trạm và máy chủ nên dịch vụ portmap (dịch vụ quản lý yêu cầu RPC) cần phải được khởi động trước. 
+- Để NFS hoạt động Linux cần khởi động ít nhất ba tiến trình sau: 
+    - **Portmapper:** tiến trình này không làm việc trực tiếp với dịch vụ NFS mà tham gia quản lý các yêu cầu RPC từ máy trạm gửi đến.
+
+    - **Mountd:** tiến trình này sẽ ánh xạ tập tin trên máy chủ tới thư mục mà máy trạm yêu cầu. Bỏ ánh xạ khi máy trạm phát ra lệnh umount.
+
+    - **Nfs:** là tiến trình chính, thực thi nhiệm vụ của giao thức NFS, có nhiệm vụ cung cấp cho máy trạm các tập tin hoặc thư mục được yêu cầu.
+
 <a name = "A3"></a>
 ### A3. Các phiên bản
 
@@ -101,4 +109,4 @@ NFS Server| CentOS7|66.0.0.199|/24|66.0.0.1
 Client|CentOS7|66.0.0.200|/24|66.0.0.1
 
 <a name = "B3"></a>
-### B3. Triển khai
+### B3. Triển khai 
