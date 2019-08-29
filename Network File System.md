@@ -12,6 +12,9 @@
 
 - [A4. Ưu nhược điểm](#A4)
 
+    - [Các trường hợp dùng NFS](#TH)
+
+- [A5.  File cấu hình, dịch vụ](#A5)
 
 [B. LAB](#B)
 
@@ -24,14 +27,8 @@
 
 - NFS là một trong những phương pháp được sử dụng để chia sẻ dữ liệu trên các hệ thống vật lý. Được phát triển bởi SunMicrosystems và năm 1984, cho phép người dùng xem, tùy chọn lưu trữ và cập nhật trên máy tính từ xa.
 - NFS là hệ thống cung cấp dịch vụ chia sẻ file phổ biến trong hệ thống mạng Linux và Unix.
-- NFS cho phép các máy tính kết nối tới 1 phân vùng đĩa trên 1 máy từ xa giống như là local disk. Cho phép việc truyền file qua mạng được nhanh và trơn tru hơn.
-- NFS sử dụng mô hình Client/Server. Trên server có các disk chứa các file hệ thống được chia sẻ và một số dịnh vụ chạy ngầm (daemon) phục vụ cho việc chia sẻ với Client.
-- Cung cấp chức năng bảo mật file và quản lý lưu lượng sử dụng (file system quota).
-
-- Khi triển khai hệ thống lớn hoặc chuyên biệt cần áp dụng 3NFS, còn người dùng ngẫu nhiên hoặc nhỏ lẻ thì áp dụng 2NFS, 4NFS.
-- Với NFSv4, yêu cầu hệ thống phải có kernel phiên bản từ 2.6 trở lên
-
-- Client từ phiên bản kernel 2.2.18 trở đi đều hỗ trợ NFS trên nền TCP
+- Dịch vụ NFS cho phép các NFS client mount một phân vùng của NFS server như phân vùng cục bộ của nó.
+- Dịch vụ NFS không được security nhiều, vì vậy cần thiết phải tin tưởng các client được permit mount các phân vùng của NFS server.
 
 <a name = "A1"></a>
 ### A1. Một số khái niệm
@@ -42,6 +39,8 @@
 - **Caching** trên NFS Client để lưu lại một số dữ liệu cần thiết vào hệ thống cục bộ. 
 - **NFS Background Mounting** chỉ định khoảng thời gian đợi với tham số gb trong trường hợp Remote Server không tồn tại. 
 - **Hard and Soft Mounts** có ý nghĩa rằng quá trình mount file luôn được tiến hành và quá trình sử dụng RPC để mount remote file system. 
+
+- **RPC (Remote Procedure Call)** – Thủ tục gọi hàm từ xa là một kỹ thuật tiến bộ cho quá trình kết nối từ Client đến Server để sử dụng các ứng dụng và dịch vụ. RPC cho phép client có thể kết nối tới 1 dịch vụ sử dụng dynamic port nằm ở một máy tính khác.
 
 <a name = "A2"></a>
 ### A2. Cách hoạt động
@@ -92,6 +91,130 @@ Từ client, yêu cầu quyền truy cập vào dữ liệu đã xuất, bằng 
     - NFS bị chậm trong khi lưu lượng mạng lớn.
     - Client và server tin tưởng lần nhau vô điều kiện.
     - Tên máy chủ có thể là giả mạo (tự xưng là máy khác).
+
+<a name = "A"></a>
+### Các trường hợp dùng NFS
+
+- Ứng dụng hỗ trợ: VDI, Oracle, VMware ESXi, SAS Grid, SAP HANA, TIBCO, OpenStack, Docker, etc
+- Các khách hàng lớn.
+- Đơn giản, dễ quản lý.
+- Không cần client OS file system.
+- Dễ dàng mở rộng, thu hồi.
+- Dễ dàng di chuyển các storage.
+- Chạy trên Ethernet.
+- Hiệu suất lớn, độ trễ thấp. Hiệu suất tốt hơn iSCSl trong vài trường hợp.
+
+<a name = "A5"></a>
+### A5.  File cấu hình, dịch vụ
+
+***Có ba tập tin cấu hình chính, bạn sẽ cần phải chỉnh sửa để thiết lập một máy chủ NFS: `/etc/exports`, `/etc/hosts.allow` và `/etc/hosts.deny`***
+
+#### 1. File `/etc/export`
+
+*Các bạn có thể sử dụng lệnh `vi /etc/export` để chỉnh sửa file*
+
+Cú pháp cấu hình trong file:
+
+`dir host1(options) host2(options) hostN(options) …`
+
+Trong đó:
+
+- `dir` : thư mục hoặc file system muốn chia sẻ.
+- `host` : một hoặc nhiều host được cho phép mount dir. Có thể được định nghĩa là một tên, một nhóm sử dụng ký tự, * hoặc một nhóm sử dụng 1 dải địa chỉ mạng/subnetmask...
+- `options` : định nghĩa 1 hoặc nhiều options khi mount.
+
+Options|	Description
+------|---------
+rw	|quyền đọc và viết
+ro	|quyền chỉ đọc
+noaccess|	cấm truy cập vào các thư mục cấp con của thư mục được chia sẻ
+sync	|đồng bộ hóa thư mục dùng chung
+root_squash|	ngăn remote root users
+no_root_squash	|cho phép remote root users
+async	|Tùy chọn này cho phép máy chủ NFS vi phạm giao thức NFS và trả lời các yêu cầu trước khi bất kỳ thay đổi nào được thực hiện bởi yêu cầu đó đã được cam kết lưu trữ ổn định
+secure	|Tùy chọn này yêu cầu các yêu cầu bắt nguồn trên một cổng Internet nhỏ hơn IPPORT_RESERVED (1024). (Mặc định)
+insecure|	Tùy chọn này chấp nhận tất cả các cổng
+wdelay	|Trì hoãn cam kết một yêu cầu ghi vào đĩa nếu nó nghi ngờ rằng một yêu cầu ghi liên quan khác có thể đang được tiến hành hoặc có thể đến sớm. (Mặc định)
+subtree_check|	Tùy chọn này kiểm tra cây con
+all_squash	|Ánh xạ tất cả các uids và gids cho người dùng ẩn danh. Hữu ích cho NFS xuất các thư mục FTP công cộng, thư mục bộ đệm tin tức
+
+Ví dụ 1 file cấu hình mẫu:
+```
+/usr/local *.vqmanh.vn(ro) 
+/home 66.0.0.0/24(rw) 
+/var/tmp 66.0.0.199(rw) 66.0.0.200(rw)
+```
+
+- Dòng thứ nhất: Cho phép tất cả các host với tên miền định dạng “somehost”.vqmanh.vn được mount thư mục /usr/local với quyền chỉ đọc.
+- Dòng thứ hai: Cho phép bất kỳ host nào có địa chỉ IP thuộc subnet 66.0.0.0/24 được mount thư mục /home với quyền đọc và ghi.
+- Dòng thứ ba: Cho phép 2 host được mount thư mục /var/tmp với quyền đọc và ghi.
+
+#### 2. File `/etc/hosts.allow` và `/etc/hosts.deny`
+
+Hai tập tin này định nghĩa các quy tắt(luật) truy cập vào hệ thống ở tầng ứng dụng mạng. Dựa trên điều khiển TCPWappers và  là một dạng tường lửa ở tầng ứng dụng.
+
+Thứ tự ưu tiên của /etc/hosts.allow trước, rồi đến /etc/hosts.deny. Nghĩa là nếu có trong hosts.allow thì không cần tìm trong hosts.deny nữa.
+
+Cú pháp trong hosts.allow và hosts.deny như sau:
+
+`deamon: client` 
+
+Trong đó:
+- `deamon`: là dịch vụ cần áp đặt luật. Nếu để là ALL sẽ áp dụng cho mọi dịch vụ.
+- `client`: là địa chỉ ip nguồn, host nguồn
+
+***Chú ý:***
+- Nếu có nhiều client ta sử dụng dấu `‘,’` để ngăn cách
+- Nếu muốn áp đặt cho một lớp mạng ta khai báo lớp mạng và kết thúc với dấu `‘.’`
+
+Ví dụ:
+
+`portmap: 66.0.0. , 66.0.0.5`
+
+`sshd: 192.168.1. , 192.168.3.2`
+
+
+Ví dụ:
+ Chặn mọi truy cập từ client có IP 192.168.10.10
+
+`ALL: 192.168.10.10`
+
+Ví dụ:
+ Chặn tất cả client truy cập vào vsftp
+
+`vsftpd: ALL`
+
+- Kiểm tra file host.allow – nếu client phù hợp với 1 quy tắc được liệt kê tại đây thì nó có quyền truy cập.
+- Nếu client không phù hợp với 1 mục trong host.allow server chuyển sang kiểm tra trong host.deny để xem thử client có phù hợp với 1 quy tắc được liệt kê trong đó hay không (host.deny). Nếu phù hợp thì client bị từ chối truy cập.
+- Nếu client phù hợp với các quy tắc không được liệt kê trong cả 2 file thì nó sẽ được quyền truy cập.
+
+
+
+#### 3. Các dịch vụ có liên quan
+
+Để sử dụng dịch vụ NFS, cần có các daemon (dịch vụ chạy ngầm trên hệ thống) sau:
+
+- **Portmap**: Quản lý các kết nối, dịch vụ chạy trên port 2049 và 111 ở cả server và client.
+- **NFS**: Khởi động các tiến trình RPC (Remote Procedure Call) khi được yêu cầu để phục vụ cho chia sẻ file, dịch vụ chỉ chạy trên server.
+- **NFS lock**: Sử dụng cho client khóa các file trên NFS server thông qua RPC.
+
+#### 4. Khởi động portmapper
+
+- NFS phụ thuộc vào tiến trình ngầm quản lý các kết nối (`portmap` hoặc `rpc.portmap`), chúng cần phải được khởi động trước.
+
+- Nó nên được đặt tại `/sbin` nhưng đôi khi trong `/usr/sbin`. Hầu hết các bản phân phối linux gần đây đều khởi động dịch vụ này trong kịch bản khởi động (boot scripts – tự khởi động khi server khởi động) nhưng vẩn phải đảm bảo nó được khởi động đầu tiên trước khi bạn làm việc với NFS (chỉ cần gõ lệnh `netstat -anp |grep portmap` để kiểm tra).
+
+#### 5. Các tiến trình ngầm
+
+Dịch vụ NFS được hỗ trợ bởi 5 tiến trình ngầm:
+
+- **rpc.nfsd**: thực hiện hầu hết mọi công việc.
+- **rpc.lockd and rpc.statd**: quản lý việc khóa các file.
+- **rpc.mountd**: quản lý các yêu cầu gắn kết lúc ban đầu.
+- **rpc.rquotad**: quản lý các hạn mức truy cập file của người sử dụng trên server được truy xuất.
+- **lockd**: được gọi theo yêu cầu của nfsd. Vì thế bạn cũng không cần quan tâm lắm tới việc khởi động nó.
+- **statd**: thì cần phải được khởi động riêng.
+
 
 <a name = "B"></a>
 ## B. LAB
