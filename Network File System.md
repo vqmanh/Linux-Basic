@@ -92,7 +92,7 @@ Từ client, yêu cầu quyền truy cập vào dữ liệu đã xuất, bằng 
     - Client và server tin tưởng lần nhau vô điều kiện.
     - Tên máy chủ có thể là giả mạo (tự xưng là máy khác).
 
-<a name = "A"></a>
+<a name = "TH"></a>
 ### Các trường hợp dùng NFS
 
 - Ứng dụng hỗ trợ: VDI, Oracle, VMware ESXi, SAS Grid, SAP HANA, TIBCO, OpenStack, Docker, etc
