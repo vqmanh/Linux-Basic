@@ -58,6 +58,7 @@ Từ client, yêu cầu quyền truy cập vào dữ liệu đã xuất, bằng 
 
     - **Nfs:** là tiến trình chính, thực thi nhiệm vụ của giao thức NFS, có nhiệm vụ cung cấp cho máy trạm các tập tin hoặc thư mục được yêu cầu.
 
+
 <a name = "A3"></a>
 ### A3. Các phiên bản
 
@@ -77,6 +78,13 @@ Từ client, yêu cầu quyền truy cập vào dữ liệu đã xuất, bằng 
 - NFSv4.2: Tháng 11 năm 2016
     - Sao chép và sao chép phía máy chủ
     - Một lợi thế lớn của NFSv4 so với các phiên bản trước đó là chỉ có một cổng IP được sử dụng để chạy dịch vụ, giúp đơn giản hóa việc sử dụng giao thức trên tường lửa.
+
+- NFSv2 và v3 dựa trên RPC ( Remote Procedure Call) , RPC được điểu khiển bởi portmap .
+
+- Tất cả các version của NFS sử dụng TCP , nhưng NFSv2 và v3 có thể dùng UDP để thiết lập kết nối stateless giữa client và server.
+
+- NFSv4 không tương tác với portmapper , rpc.mountd , rpc.lockd , rpc.statd vì những thứ đấy được chuyển vào kernal .NFSv4 listen các request tại well known TCP port 2049
+
 
 <a name = "A4"></a>
 ### **A4. Ưu nhược điểm**
@@ -198,6 +206,8 @@ Ví dụ:
 - **NFS**: Khởi động các tiến trình RPC (Remote Procedure Call) khi được yêu cầu để phục vụ cho chia sẻ file, dịch vụ chỉ chạy trên server.
 - **NFS lock**: Sử dụng cho client khóa các file trên NFS server thông qua RPC.
 
+
+
 #### 4. Khởi động portmapper
 
 - NFS phụ thuộc vào tiến trình ngầm quản lý các kết nối (`portmap` hoặc `rpc.portmap`), chúng cần phải được khởi động trước.
@@ -233,3 +243,124 @@ Client|CentOS7|66.0.0.200|/24|66.0.0.1
 
 <a name = "B3"></a>
 ### B3. Triển khai 
+
+***Trên NFS Server**
+
+**Bước 1: Cài gói `nfs-until`***
+
+`yum install nfs-utils -y`
+
+**Bước 2: Tạo thư mục chia sẻ**
+
+`[root@vqmanh ~]# mkdir /datachung`
+
+**Bước 3: Sửa file /etc/exports**
+
+`[root@vqmanh ~]# echo "/datachung 66.0.0.200(rw,no_root_squash)" >> /etc/exports`
+
+*Ở đây mình cho  quyền đọc ghi và remote root user*
+
+**Bước 4: Khởi động dịch vụ**
+
+```
+[root@vqmanh ~]# systemctl start rpcbind
+[root@vqmanh ~]# systemctl start nfs-server
+[root@vqmanh ~]# systemctl enable rpcbind
+[root@vqmanh ~]# systemctl enable nfs-server
+```
+
+**Để kiểm tra các port sử dụng bởi NFS:**
+
+`rpcinfo -p`
+
+<img src=https://imgur.com/9ik3b1N.jpg>
+
+- Port của dịch vụ Portmapper là 111
+
+- Port của dịch vụ NFS là 2049   
+
+*Chú ý: Nếu thay đổi trong `/etc/exports`, các thay đổi đó có thể chưa có hiệu lực ngay lập tức, bạn phải thực thi lệnh **exportfs -ra** để bắt `nfs` cập nhật lại nội dung file `/etc/exports`*
+
+**Bước 5: Cấu hình firewall để NFS client được phép truy cập**
+
+```
+[root@vqmanh ~]# sudo firewall-cmd --permanent --add-service=nfs
+success
+[root@vqmanh ~]# sudo firewall-cmd --permanent --add-service=mountd
+success
+[root@vqmanh ~]# sudo firewall-cmd --permanent --add-service=rpc-bind
+success
+[root@vqmanh ~]# sudo firewall-cmd --permanent --add-port=2049/tcp
+success
+[root@vqmanh ~]# sudo firewall-cmd --permanent --add-port=2049/udp
+success
+[root@vqmanh ~]# sudo firewall-cmd --reload
+success
+```
+
+***Kiểm tra mountpoint trên server**
+
+```
+[root@vqmanh ~]# showmount -e localhost
+Export list for localhost:
+/datachung 66.0.0.200
+```
+
+**Cấu hình NFS Client***
+
+**Bước 1: Cài 2 packet nfs-utils và nfs-utils-lib**
+
+`yum install nfs-utils nfs-utils-lib -y`
+
+**Kiểm tra mountpoint trên server từ client**
+
+```
+[root@vqmanh ~]# showmount -e 66.0.0.199
+Export list for 66.0.0.199:
+/datachung 66.0.0.200
+```
+**Bước 2: Mount thư mục được chia sẻ vào thư mục local**
+
+Cách 1: Mount mềm
+
+ Cú pháp: `mount IP_server:/Thư_mục_chia_sẻ Thư_mục_trên_client`
+
+  `[root@vqmanh ~]# mount 66.0.0.199:/datachung /mnt/`
+
+
+
+**NFS có 2 chế độ mount:**
+
+- Mount cứng là ghi trực tiếp vào file /etc/fstab
+
+- Mount mềm là mount bằng lệnh thông thường và bị mất khi máy tính được khởi động lại
+
+Cách 2: Mount cứng
+
+`echo "66.0.0.199:/datachung /mnt nfs rw,sync,hard,intr 0 0" >> /etc/fstab`
+
+Kiểm tra:
+
+```
+[root@vqmanh ~]# df -h
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/mapper/centos-root   27G  1.2G   26G   5% /
+devtmpfs                 899M     0  899M   0% /dev
+tmpfs                    910M     0  910M   0% /dev/shm
+tmpfs                    910M  9.6M  901M   2% /run
+tmpfs                    910M     0  910M   0% /sys/fs/cgroup
+/dev/sda1               1014M  182M  833M  18% /boot
+tmpfs                    182M     0  182M   0% /run/user/0
+66.0.0.199:/datachung     20G   20G   68M 100% /mnt
+```
+
+Vì chúng ta cho quyền client có thể đọc ghi nên ta có thể thử tạo 1 file.
+
+VD: 
+
+```
+[root@vqmanh mnt]# touch vqmanh.txt
+[root@vqmanh mnt]# echo "cai dat nfs" > vqmanh.txt
+```
+
+Sau đó bạn có thể kiểm tra bên NFS Server.
