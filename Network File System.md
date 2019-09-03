@@ -1,5 +1,7 @@
 # NFS (Network File System)
 
+<img src=https://imgur.com/XZTwsOa.png>
+
 ## Nội dung 
 
 [A. Tổng quan về NFS](#A)
@@ -29,6 +31,13 @@
 - NFS là hệ thống cung cấp dịch vụ chia sẻ file phổ biến trong hệ thống mạng Linux và Unix.
 - Dịch vụ NFS cho phép các NFS client mount một phân vùng của NFS server như phân vùng cục bộ của nó.
 - Dịch vụ NFS không được security nhiều, vì vậy cần thiết phải tin tưởng các client được permit mount các phân vùng của NFS server.
+
+- NFS hoạt động theo mô hình client/server. Một server đóng vai trò storage system, cho phép nhiều client kết nối tới để sử dụng dịch vụ.
+- Client và Server sử dụng RPC (Remote Procedure Call) để giao tiếp với nhau.
+- NFS sử dụng cổng 2049.
+- Cho phép bạn quản lý không gian lưu trữ ở một nơi khác và ghi vào không gian lưu trữ này từ nhiều clients.
+- NFS cung cấp một cách tương đối nhanh chóng và dễ dàng để truy cập vào các hệ thống từ xa qua mạng và hoạt động tốt trong các tình huống mà các tài nguyên chia sẻ sẽ được truy cập thường xuyên.
+- Dung lượng file mà NFS cho phép client truy cập lớn hơn 2GB.
 
 <a name = "A1"></a>
 ### A1. Một số khái niệm
@@ -111,6 +120,13 @@ Từ client, yêu cầu quyền truy cập vào dữ liệu đã xuất, bằng 
 - Dễ dàng di chuyển các storage.
 - Chạy trên Ethernet.
 - Hiệu suất lớn, độ trễ thấp. Hiệu suất tốt hơn iSCSl trong vài trường hợp.
+
+**Trong quá trình vận hành có thể xảy ra một số trường hợp sau:**
+
+- Có 2 client đồng thời mount cùng một thư mục trên server: cả 2 đều có thể đồng thời chỉnh sửa cùng một file => hệ thống sẽ thông báo cho client sử dụng sau biết rằng có một client khác đang chỉnh sửa file. Nếu client này thực hiện sửa thì file sẽ lưu lại theo client nào thực hiện lưu cuối cùng.
+- NFS server bị shutdown hoặc dịch vụ tắt. Client sẽ bị treo máy và chờ đến khi được kết nối trở lại. Việc kết nối được thực hiện ngầm, trong suốt với người dùng.
+
+
 
 <a name = "A5"></a>
 ### A5.  File cấu hình, dịch vụ
