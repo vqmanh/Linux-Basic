@@ -24,6 +24,8 @@
 - [B2. IP Planing](#B2)
 - [B3. Triển khai](#B3)
 
+[C. NFS 4 ACL Tool](#C)
+
 <a name = "A"></a>
 ## A. Tổng quan về NFS
 
@@ -380,3 +382,145 @@ VD:
 ```
 
 Sau đó bạn có thể kiểm tra bên NFS Server.
+
+<a name = "C"></a>
+## C. NFS 4 ACL Tool
+
+- ACL (Access Control List) danh sách kiểm soát truy cập là danh sách các quyền được liên kết với tệp hoặc thư mục. Các quyền này cho phép bạn hạn chế quyền truy cập vào tệp hoặc thư mục cho người dùng hoặc nhóm. Các NFSv4 ACL cung cấp các tùy chọn cụ thể hơn các quyền read/write/execute được sử dụng trong hầu hết các hệ thống.
+
+**Để xem ACL, sử dụng lệnh sau:**
+
+`nfs4_getfacl file`
+
+**Cài đặt Công cụ ACL NFS 4 trên NFS Client**
+
+` yum -y install nfs4-acl-tools`
+
+***Kiểm tra thư mục mount***
+
+```
+[root@vqmanh ~]# df -hT /mnt
+Filesystem            Type  Size  Used Avail Use% Mounted on
+66.0.0.199:/datachung nfs4   20G   20G   50M 100% /mnt
+[root@vqmanh ~]# ll /mnt/
+total 4
+-rw-r--r--. 1 root root  0 Sep  3 15:47 haha.txt
+-rw-r--r--. 1 root root 27 Sep  3 15:44 vqmanh.txt
+````
+
+**Hiển thị ACL của một tệp hoặc thư mục trên hệ thống tệp NFSv4**
+
+```
+[root@vqmanh ~]# nfs4_getfacl /mnt/vqmanh.txt
+
+# file: /mnt/vqmanh.txt
+A::OWNER@:rwatTcCy
+A::GROUP@:rtcy
+A::EVERYONE@:rtcy
+[root@vqmanh ~]# nfs4_getfacl /mnt/haha.txt
+
+# file: /mnt/haha.txt
+A::OWNER@:rwatTcCy
+A::GROUP@:rtcy
+A::EVERYONE@:rtcy
+```
+
+**Mỗi mục có nghĩa như sau:**
+-  **ACE** - 4 mục kiểm soát truy cập
+    - **(ACE Type):(ACE Flags):(ACE Principal):(ACE Permissions)**
+
+Description
+
+ACE Type|   |	 
+--------|---
+A|	A = Allow : Cho phép truy cập
+D|	D = Deny : Từ chối truy cập
+
+- **A** biểu thị "Cho phép" có nghĩa là ACL này cho phép người dùng hoặc nhóm thực hiện các hành động yêu cầu quyền. Bất cứ điều gì không được phép rõ ràng đều bị từ chối theo mặc định.
+
+- Lưu ý: **D** có thể biểu thị một Từ chối ACE. Mặc dù đây là một tùy chọn hợp lệ, nhưng loại ACE này không được đề xuất vì bất kỳ quyền nào không được cấp phép đều tự động bị từ chối có nghĩa là từ chối của ACE có thể là dư thừa và phức tạp.
+
+ACE Flags|   |	 
+--------|---
+d|	Directory-Inherit : Các thư mục con mới sẽ có cùng ACE
+f|	File-Inherit : Các tệp mới sẽ có cùng ACE trừ các Flag thừa kế 
+n|	No-Propogate-Inherit : Các thư mục con mới sẽ kế thừa ACE trừ các Flag thừa kế
+i|Inherit-Only : Tập tin/thư mục con mới kế thừa cùng một ACE nhưng thư mục này không có ACE.
+
+VD: **A:d:user@nfsdomain:rxtncy**
+
+
+**ACE Principal**
+
+- User
+    - VD: user@nfsdomain.org
+
+- Special principals
+    - OWNER@
+    - GROUP@
+    - EVERYONE@
+- Group
+    - Lưu ý: Khi `principal` là một group, bạn cần thêm cờ nhóm `g`
+    - VD: **A:g:group@nfsdomain:rxtncy**
+
+**ACE Permissions**
+
+`Rxtncy` là các quyền mà ACE đang cho phép. Một danh sách các quyền và những gì họ làm có thể được tìm thấy dưới đây:
+
+ACE Permissions|Function
+----------|---------
+r	|Đọc dữ liệu của tập tin / Danh sách tập tin trong thư mục
+w	|Ghi dữ liệu vào tệp / Tạo tệp mới trong thư mục
+a|	Nối dữ liệu vào tệp / Tạo thư mục con mới
+x	|Thực thi tập tin / Thay đổi thư mục
+d	|Xóa tập tin hoặc thư mục
+D	|Xóa các tập tin hoặc thư mục con trong thư mục
+t	|đọc các thuộc tính của tập tin / thư mục
+T	|ghi thuộc tính của tập tin / thư mục
+n	|đọc các thuộc tính được đặt tên của tập tin / thư mục
+N	|ghi các thuộc tính được đặt tên của tập tin / thư mục
+c	|đọc tập tin / thư mục ACL
+C	|ghi tập tin / thư mục ACL
+o	|thay đổi quyền sở hữu của tập tin / thư mục
+ 
+
+ACE Permissions Aliases|    |
+------------|-------
+R	|R = rntcy : Read
+W	|W = watTNcCy : Write
+X	|X = xtcy : Execute
+
+### Sử dụng NFSv4 ACL
+
+Để thiết lập một ACE, sử dụng lệnh này:
+
+`nfs4_setfacl [OPTIONS] file`
+
+Để sửa đổi một ACE, sử dụng lệnh này:
+
+`nfs4_editfacl [OPTIONS] file`
+
+### Commands
+
+
+COMMAND	|FUNCTION
+-----|---------
+-a acl_spec [index]|thêm các mục ACL trong acl_spec tại chỉ mục (DEFAULT: 1)
+-x acl_spec |xóa các mục ACL hoặc mục nhập tại chỉ mục khỏi ACL
+-A file [index]	|đọc các mục ACL để thêm từ tập tin
+-X file 	|đọc các mục ACL để xóa khỏi tập tin
+-s acl_spec	|đặt ACL thành acl_spec (thay thế ACL hiện tại)
+-S file	|đọc các mục ACL để thiết lập từ tệp
+-m from_ace to_ace	|sửa đổi tại chỗ: thay thế 'from_ace' bằng 'to_ace'
+
+### Options
+
+OPTION|	NAME|	FUNCTION
+-------|-------|-------
+-R|	recursive	|Áp dụng ACE vào các tệp và thư mục con của thư mục
+-L|	logical|	Được sử dụng với -R, theo các liên kết tượng trưng
+-P|	physical	|Được sử dụng với -R, bỏ qua các liên kết tượng trưng
+ 
+
+**Thêm hoặc xóa ACE**
+
