@@ -383,6 +383,22 @@ VD:
 
 Sau đó bạn có thể kiểm tra bên NFS Server.
 
+### Đối với Client là Window
+
+**Mở dịch vụ NFS theo hình dưới đây:**
+
+<img src=https://imgur.com/7Nyz4ir.jpg>
+
+**Sau đó truy cập CMD và gõ lệnh**
+
+***Cú pháp: `mount [NFS server's hostname hoặc IP NFS server]:/[thư mục được share] [Ổ muốn mount]:\`***
+
+<img src=https://imgur.com/3f0Ypx0.jpg>
+
+**Sau đó kiểm tra**
+
+<img src=https://imgur.com/5fR5BAb.jpg>
+
 <a name = "C"></a>
 ## C. NFS 4 ACL Tool
 
@@ -522,5 +538,5 @@ OPTION|	NAME|	FUNCTION
 -P|	physical	|Được sử dụng với -R, bỏ qua các liên kết tượng trưng
  
 
-**Thêm hoặc xóa ACE**
+
 
