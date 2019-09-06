@@ -252,7 +252,7 @@ Dịch vụ NFS được hỗ trợ bởi 5 tiến trình ngầm:
 <img src=https://imgur.com/GaTE1sc.jpg>
 
 <a name = "B2"></a>
-### B2. IP Planing
+### B2. IP Planning
 
 Tên máy ảo|	Hệ điều hành|	IP address|	Subnet mask|	Default gateway
 ------|-----|----------|--------|-----
