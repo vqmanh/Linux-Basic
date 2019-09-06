@@ -401,6 +401,8 @@ Sau đó bạn có thể kiểm tra bên NFS Server.
 
 Sử dụng lệnh `nfsstat` hiển thị số liệu thống kê lưu về hoạt động của máy khách và máy chủ NFS.
 
+***Lưu ý: Nếu chúng ta có 2 client cùng truy cập vào 1 file để sửa đổi thì file đó sẽ lưu lại của người có thao tác lưu cuối cùng.***
+
 <a name = "C"></a>
 ## C. NFS 4 ACL Tool
 
