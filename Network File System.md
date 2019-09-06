@@ -302,17 +302,17 @@ Client|CentOS7|66.0.0.200|/24|66.0.0.1
 **Bước 5: Cấu hình firewall để NFS client được phép truy cập**
 
 ```
-[root@vqmanh ~]# sudo firewall-cmd --permanent --add-service=nfs
+[root@vqmanh ~]# firewall-cmd --permanent --add-service=nfs
 success
-[root@vqmanh ~]# sudo firewall-cmd --permanent --add-service=mountd
+[root@vqmanh ~]# firewall-cmd --permanent --add-service=mountd
 success
-[root@vqmanh ~]# sudo firewall-cmd --permanent --add-service=rpc-bind
+[root@vqmanh ~]# firewall-cmd --permanent --add-service=rpc-bind
 success
-[root@vqmanh ~]# sudo firewall-cmd --permanent --add-port=2049/tcp
+[root@vqmanh ~]# firewall-cmd --permanent --add-port=2049/tcp
 success
-[root@vqmanh ~]# sudo firewall-cmd --permanent --add-port=2049/udp
+[root@vqmanh ~]# firewall-cmd --permanent --add-port=2049/udp
 success
-[root@vqmanh ~]# sudo firewall-cmd --reload
+[root@vqmanh ~]# firewall-cmd --reload
 success
 ```
 
