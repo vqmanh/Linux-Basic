@@ -262,9 +262,9 @@ Client|CentOS7|66.0.0.200|/24|66.0.0.1
 <a name = "B3"></a>
 ### B3. Triển khai 
 
-***Trên NFS Server**
+**Trên NFS Server**
 
-**Bước 1: Cài gói `nfs-until`***
+**Bước 1: Cài gói `nfs-until`**
 
 `yum install nfs-utils -y`
 
@@ -316,7 +316,7 @@ success
 success
 ```
 
-***Kiểm tra mountpoint trên server**
+**Kiểm tra mountpoint trên server**
 
 ```
 [root@vqmanh ~]# showmount -e localhost
@@ -324,7 +324,7 @@ Export list for localhost:
 /datachung 66.0.0.200
 ```
 
-**Cấu hình NFS Client***
+**Cấu hình NFS Client**
 
 **Bước 1: Cài 2 packet nfs-utils và nfs-utils-lib**
 
@@ -398,6 +398,8 @@ Sau đó bạn có thể kiểm tra bên NFS Server.
 **Sau đó kiểm tra**
 
 <img src=https://imgur.com/5fR5BAb.jpg>
+
+Sử dụng lệnh `nfsstat` hiển thị số liệu thống kê lưu về hoạt động của máy khách và máy chủ NFS.
 
 <a name = "C"></a>
 ## C. NFS 4 ACL Tool
