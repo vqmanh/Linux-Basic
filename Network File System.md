@@ -516,6 +516,8 @@ X	|X = xtcy : Execute
 
 `nfs4_setfacl [OPTIONS] file`
 
+VD:  nfs4_setfacl -a A::EVERYONE@:rxtncy /mnt/
+
 Để sửa đổi một ACE, sử dụng lệnh này:
 
 `nfs4_editfacl [OPTIONS] file`
