@@ -408,9 +408,11 @@ Sử dụng lệnh `nfsstat` hiển thị số liệu thống kê lưu về ho�
 
 ### Tổng quan về điều khiển truy cập file chia sẻ với NFSv4 ACLs
 
-Danh sách điều khiển truy cập POSIX ACL cung cấp định nghĩa mịn hơn về quyền truy cập file và thư mục so với cách phân loại đơn giản user/group/other mà vẫn thường dùng với lệnh chmod. Hơn thế nữa, NFSv4 ACLs mịn hơn POSIX ACL, dùng cho điều khiển truy cập file chia sẻ của hệ thống file mạng NFSv4.
+- Danh sách điều khiển truy cập POSIX ACL cung cấp định nghĩa mịn hơn về quyền truy cập file và thư mục so với cách phân loại đơn giản user/group/other mà vẫn thường dùng với lệnh chmod. Hơn thế nữa, NFSv4 ACLs mịn hơn POSIX ACL, dùng cho điều khiển truy cập file chia sẻ của hệ thống file mạng NFSv4.
 
-Một ACL(Access Control List) là một danh sách phép kết hợp với một file hoặc thư mục, bao gồm một hay nhiều mục điều khiển truy cập (ACEs – Access Control Entries). Một NFSv4 ACL được kí hiệu là `acl_spec`, bao gồm các mục NFSv4 ACE được kí hiệu là `ace_spec`. Các `ace_spec` trong `acl_spec` ngăn cách nhau bởi dấu phẩy (,) hoặc tab, nhưng thường được soạn thảo mỗi `ace_spec` trên một dòng. Một `ace_spec` gồm có 4 trường cách nhau bởi dấu hai chấm (:)
+- Một ACL(Access Control List) là một danh sách phép kết hợp với một file hoặc thư mục, bao gồm một hay nhiều mục điều khiển truy cập (ACEs – Access Control Entries). Một NFSv4 ACL được kí hiệu là `acl_spec`, bao gồm các mục NFSv4 ACE được kí hiệu là `ace_spec`. Các `ace_spec` trong `acl_spec` ngăn cách nhau bởi dấu phẩy (,) hoặc tab, nhưng thường được soạn thảo mỗi `ace_spec` trên một dòng. Một `ace_spec` gồm có 4 trường cách nhau bởi dấu hai chấm (:)
+
+- Server không nhất thiết hỗ trợ đầy đủ các thuộc tính NFSv4 ACL. Mặc dù khách đặt các thuộc tính, server có trách nhiệm diễn dịch các yêu cầu và chỉ thực hiện các hoạt động quản trị tin tưởng nơi server. Nó chuyển đổi NFSv4 ACL sang POSIX ACL và loại bỏ các thuộc tính không hỗ trợ. 
 
 
 **Để xem ACL, sử dụng lệnh sau:**
@@ -471,6 +473,7 @@ L|Báo-động: tạo ra báo động hệ thống (tùy thuộc hệ thống) t
 **ACE Flags**
 
 - Có 3 loại cờ: cờ nhóm (g), cờ kế thừa (d,f,n,i) và cờ quản trị (S,F). Kiểu Cho-phép hoặc Từ-chối có thể không có cờ, nhưng kiểu Kiểm-tra hoặc Báo-động phải đi với ít nhất một trong hai cờ truy-cập-thành-công và truy-cập-thất-bại.
+- Các ACE được kế thừa từ ACL của thư mục cha vào lúc tạo file hay thư mục con. Theo đó, cờ kế thừa chỉ có thể được sử dụng trong các ACE trong ACL của một thư mục, và do đó bị tước bỏ khỏi các ACE kế thừa trong ACL của một file mới.
 
 ACE Flags|   |	 
 --------|---
