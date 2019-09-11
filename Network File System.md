@@ -406,7 +406,12 @@ Sử dụng lệnh `nfsstat` hiển thị số liệu thống kê lưu về ho�
 <a name = "C"></a>
 ## C. NFS 4 ACL Tool
 
-- ACL (Access Control List) danh sách kiểm soát truy cập là danh sách các quyền được liên kết với tệp hoặc thư mục. Các quyền này cho phép bạn hạn chế quyền truy cập vào tệp hoặc thư mục cho người dùng hoặc nhóm. Các NFSv4 ACL cung cấp các tùy chọn cụ thể hơn các quyền read/write/execute được sử dụng trong hầu hết các hệ thống.
+### Tổng quan về điều khiển truy cập file chia sẻ với NFSv4 ACLs
+
+Danh sách điều khiển truy cập POSIX ACL cung cấp định nghĩa mịn hơn về quyền truy cập file và thư mục so với cách phân loại đơn giản user/group/other mà vẫn thường dùng với lệnh chmod. Hơn thế nữa, NFSv4 ACLs mịn hơn POSIX ACL, dùng cho điều khiển truy cập file chia sẻ của hệ thống file mạng NFSv4.
+
+Một ACL(Access Control List) là một danh sách phép kết hợp với một file hoặc thư mục, bao gồm một hay nhiều mục điều khiển truy cập (ACEs – Access Control Entries). Một NFSv4 ACL được kí hiệu là `acl_spec`, bao gồm các mục NFSv4 ACE được kí hiệu là `ace_spec`. Các `ace_spec` trong `acl_spec` ngăn cách nhau bởi dấu phẩy (,) hoặc tab, nhưng thường được soạn thảo mỗi `ace_spec` trên một dòng. Một `ace_spec` gồm có 4 trường cách nhau bởi dấu hai chấm (:)
+
 
 **Để xem ACL, sử dụng lệnh sau:**
 
@@ -448,29 +453,40 @@ A::EVERYONE@:rtcy
 **Mỗi mục có nghĩa như sau:**
 -  **ACE** - 4 mục kiểm soát truy cập
     - **(ACE Type):(ACE Flags):(ACE Principal):(ACE Permissions)**
+    = **kiểu:các_cờ:chủ_thể:các_quyền**
 
 Description
 
 ACE Type|   |	 
 --------|---
-A|	A = Allow : Cho phép truy cập
-D|	D = Deny : Từ chối truy cập
+A|	A = Allow : Cho-phép: cho phép `chủ_thể` thực hiện hành động với các_quyền
+D|	D = Deny : Từ-chối: không cho phép `chủ_thể` thực hiện hành động với các_quyền
+U|Kiểm-tra: ghi nhật ký (tùy thuộc hệ thống) bất kỳ nỗ lực truy cập bởi `chủ_thể` với `các_quyền`. Yêu cầu đi với một hoặc cả hai cờ `truy-cập-thành-công` và `truy-cập-thất-bại`.
+L|Báo-động: tạo ra báo động hệ thống (tùy thuộc hệ thống) tại bất kỳ nỗ lực truy cập bởi `chủ_thể` với `các_quyền`. Yêu cầu đi với một hoặc cả hai cờ `truy-cập-thành-công` và `truy-cập-thất-bại`.`
 
 - **A** biểu thị "Cho phép" có nghĩa là ACL này cho phép người dùng hoặc nhóm thực hiện các hành động yêu cầu quyền. Bất cứ điều gì không được phép rõ ràng đều bị từ chối theo mặc định.
 
 - Lưu ý: **D** có thể biểu thị một Từ chối ACE. Mặc dù đây là một tùy chọn hợp lệ, nhưng loại ACE này không được đề xuất vì bất kỳ quyền nào không được cấp phép đều tự động bị từ chối có nghĩa là từ chối của ACE có thể là dư thừa và phức tạp.
 
+**ACE Flags**
+
+- Có 3 loại cờ: cờ nhóm (g), cờ kế thừa (d,f,n,i) và cờ quản trị (S,F). Kiểu Cho-phép hoặc Từ-chối có thể không có cờ, nhưng kiểu Kiểm-tra hoặc Báo-động phải đi với ít nhất một trong hai cờ truy-cập-thành-công và truy-cập-thất-bại.
+
 ACE Flags|   |	 
 --------|---
-d|	Directory-Inherit : Các thư mục con mới sẽ có cùng ACE
-f|	File-Inherit : Các tệp mới sẽ có cùng ACE trừ các Flag thừa kế 
-n|	No-Propogate-Inherit : Các thư mục con mới sẽ kế thừa ACE trừ các Flag thừa kế
-i|Inherit-Only : Tập tin/thư mục con mới kế thừa cùng một ACE nhưng thư mục này không có ACE.
+g|Cờ nhóm: có thể sử dụng trong bất kỳ ACE, chỉ ra chủ_thể là một nhóm.
+d|	Directory-Inherit : Cờ kế thừa: có thể sử dụng trong bất kỳ ACE thư mục, kế-thừa-thư-mục: thư mục con tạo mới sẽ kế thừa ACE.
+f|	File-Inherit : kế-thừa-file: file tạo mới sẽ kế thừa ACE, ngoại trừ cờ kế thừa. Thư mục con tạo mới sẽ kế thừa ACE. Nếu kế-thừa-thư-mục không chỉ ra trong ACE cha, chỉ-kế-thừa sẽ được thêm tới ACE kế thừa. 
+n|	No-Propogate-Inherit : không-truyền-kế-thừa: thư mục con tạo mới sẽ kế thừa ACE, ngoại trừ cờ kế thừa.
+i|Inherit-Only : chỉ-kế-thừa: ACE không quan tâm tới việc kiểm tra quyền, nhưng nó di truyền được. Tuy nhiên, cờ chỉ-kế-thừa bị tước bỏ khỏi các ACE kế thừa.
+S|truy-cập-thành-công: kích hoạt một báo động/kiểm tra khi chủ_thể được phép thực hiện một hành động được phủ bởi các_quyền.
+F|truy-cập-thất-bại: kích hoạt một báo động/kiểm tra khi chủ_thể bị ngăn chặn thực hiện một hành động được phủ bởi các_quyền.
 
-VD: **A:d:user@nfsdomain:rxtncy**
 
 
 **ACE Principal**
+
+- `chủ_thể` là người sử dụng hoặc nhóm, hoặc là một trong ba chủ_thể đặc biệt: OWNER@, GROUP@, EVERYONE@ mà tương ứng tương tự với user/group/other dùng trong lệnh chmod.
 
 - User
     - VD: user@nfsdomain.org
@@ -485,26 +501,31 @@ VD: **A:d:user@nfsdomain:rxtncy**
 
 **ACE Permissions**
 
-`Rxtncy` là các quyền mà ACE đang cho phép. Một danh sách các quyền và những gì họ làm có thể được tìm thấy dưới đây:
+Quyền truy cập:
+
+- Không chỉ có ba quyền đọc, viết, thực hiện như POSIX, NFSv4 ACLs có 13 quyền cho file và 14 phép cho thư mục, `các_quyền` là một chuỗi kí tự, mỗi kí tự đại diện cho một quyền có ý nghĩa như sau:
 
 ACE Permissions|Function
 ----------|---------
 r	|Đọc dữ liệu của tập tin / Danh sách tập tin trong thư mục
 w	|Ghi dữ liệu vào tệp / Tạo tệp mới trong thư mục
-a|	Nối dữ liệu vào tệp / Tạo thư mục con mới
+a|	Thêm dữ liệu (file) / tạo thư mục con (thư mục)
 x	|Thực thi tập tin / Thay đổi thư mục
 d	|Xóa tập tin hoặc thư mục
 D	|Xóa các tập tin hoặc thư mục con trong thư mục
-t	|đọc các thuộc tính của tập tin / thư mục
+t	|Đọc thuộc tính: đọc thuộc tính của file / thư mục (là thuộc tính cơ bản của file / thư mục, được trình bày với ls -l, stat)
 T	|ghi thuộc tính của tập tin / thư mục
 n	|đọc các thuộc tính được đặt tên của tập tin / thư mục
 N	|ghi các thuộc tính được đặt tên của tập tin / thư mục
-c	|đọc tập tin / thư mục ACL
-C	|ghi tập tin / thư mục ACL
-o	|thay đổi quyền sở hữu của tập tin / thư mục
+c	|Đọc ACL: đọc NFSv4 ACL của file / thư mục
+C	|Viết chủ: thay đổi chủ và nhóm của file / thư mục
+o	|Thay đổi quyền sở hữu của tập tin / thư mục
+y|Đồng bộ: cho phép khách sử dụng đồng bộ I/O với server
  
+**ACE Permissions Aliases**
 
-ACE Permissions Aliases|    |
+Trong trường hợp sử dụng đơn giản, chữ viết tắt có thể được sử dụng làm bí danh thể hiện phép một cách chung chung. Đó là các phép đọc ( R ), viết ( W ) và thực hiện ( X ) quen thuộc với các bit chế độ truy cập file của lệnh chmod.
+ACE Permissions Aliases|    
 ------------|-------
 R	|R = rntcy : Read
 W	|W = watTNcCy : Write
@@ -514,34 +535,39 @@ X	|X = xtcy : Execute
 
 Để thiết lập một ACE, sử dụng lệnh này:
 
+`nfs4_setfacl`
+
+Đặt, soạn thảo NFSv4 ACL của file hoặc thư mục chia sẻ. Cách sử dụng như sau:
+
 `nfs4_setfacl [OPTIONS] file`
 
-VD:  nfs4_setfacl -a A::EVERYONE@:rxtncy /mnt/
+- file đại diện cho file hoặc thư mục.
 
-Để sửa đổi một ACE, sử dụng lệnh này:
-
-`nfs4_editfacl [OPTIONS] file`
+- Có một lệnh bổ sung là `nfs4_editfacl`, tương đương với `nfs4_setfacl -e`
 
 ### Commands
 
 
 COMMAND	|FUNCTION
 -----|---------
--a acl_spec [index]|thêm các mục ACL trong acl_spec tại chỉ mục (DEFAULT: 1)
--x acl_spec |xóa các mục ACL hoặc mục nhập tại chỉ mục khỏi ACL
--A file [index]	|đọc các mục ACL để thêm từ tập tin
--X file 	|đọc các mục ACL để xóa khỏi tập tin
--s acl_spec	|đặt ACL thành acl_spec (thay thế ACL hiện tại)
--S file	|đọc các mục ACL để thiết lập từ tệp
--m from_ace to_ace	|sửa đổi tại chỗ: thay thế 'from_ace' bằng 'to_ace'
+-a acl_spec [index]|thêm các ACE từ `acl_spec` tới ACL của file. Các ACE được chèn tại ví trí thứ index (mặc định là 1) của ACL của file.
+-x acl_spec |xóa các ACE khớp từ `acl_spec`, hoặc xóa ACE thứ index từ ACL của file.
+-A file [index]	|thêm các ACE từ `acl_spec` trong `acl_file` tới ACL của file. Các ACE được chèn tại ví trí thứ index (mặc định là 1) của ACL của file.
+-X file 	|xóa các ACE khớp từ `acl_spec` trong `acl_file` từ ACL của file.
+-s acl_spec	|đặt ACL thành `acl_spec` (thay thế ACL hiện tại)
+-S file	|đặt ACL của file tới acl_spec trong `acl_file`.
+-m from_ace to_ace	|sửa đổi ACL của file bằng cách thay `from_ace` với `to_ace`.
+-e, --edit|soạn thảo ACL của file. Nếu có nhiều file được chỉ ra, trình soạn thảo sẽ được gọi lần lượt cho từng file.
+--version|trình bày phiên bản chương trình và thoát ra.
 
 ### Options
 
 OPTION|	NAME|	FUNCTION
 -------|-------|-------
--R|	recursive	|Áp dụng ACE vào các tệp và thư mục con của thư mục
--L|	logical|	Được sử dụng với -R, theo các liên kết tượng trưng
--P|	physical	|Được sử dụng với -R, bỏ qua các liên kết tượng trưng
+-R|	--recursive	|áp dụng đệ qui tới các file và thư mục con của thư mục. Theo sau các liên kết tượng trưng (symlinks) trên dòng lệnh và bỏ qua symlinks gặp phải trong khi đệ qui xuyên qua thư mục.
+-L|	--logical|	trong liên hợp với `-R/--recursive`, đi luận lý theo tất cả symlinks.
+-P|	--physical	|trong liên hợp với `-R/--recursive`, đi vật lý theo tất cả symlinks.
+|--test||trình bày kết quả của lệnh nhưng không giữ thay đổi.
  
 
 
