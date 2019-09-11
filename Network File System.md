@@ -155,8 +155,8 @@ rw	|quyền đọc và viết
 ro	|quyền chỉ đọc
 noaccess|	cấm truy cập vào các thư mục cấp con của thư mục được chia sẻ
 sync	|đồng bộ hóa thư mục dùng chung
-root_squash|	ngăn remote root users
-no_root_squash	|cho phép remote root users
+root_squash|	ko cho đặc quyền root
+no_root_squash	|cho phép đặc quyền root
 async	|Tùy chọn này cho phép máy chủ NFS vi phạm giao thức NFS và trả lời các yêu cầu trước khi bất kỳ thay đổi nào được thực hiện bởi yêu cầu đó đã được cam kết lưu trữ ổn định
 secure	|Tùy chọn này yêu cầu các yêu cầu bắt nguồn trên một cổng Internet nhỏ hơn IPPORT_RESERVED (1024). (Mặc định)
 insecure|	Tùy chọn này chấp nhận tất cả các cổng
