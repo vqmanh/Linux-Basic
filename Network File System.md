@@ -525,7 +525,8 @@ y|Đồng bộ: cho phép khách sử dụng đồng bộ I/O với server
 **ACE Permissions Aliases**
 
 Trong trường hợp sử dụng đơn giản, chữ viết tắt có thể được sử dụng làm bí danh thể hiện phép một cách chung chung. Đó là các phép đọc ( R ), viết ( W ) và thực hiện ( X ) quen thuộc với các bit chế độ truy cập file của lệnh chmod.
-ACE Permissions Aliases|    
+
+Aliases| |   
 ------------|-------
 R	|R = rntcy : Read
 W	|W = watTNcCy : Write
