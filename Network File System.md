@@ -506,7 +506,7 @@ F|truy-cập-thất-bại: kích hoạt một báo động/kiểm tra khi chủ_
 
 Quyền truy cập:
 
-- Không chỉ có ba quyền đọc, viết, thực hiện như POSIX, NFSv4 ACLs có 13 quyền cho file và 14 phép cho thư mục, `các_quyền` là một chuỗi kí tự, mỗi kí tự đại diện cho một quyền có ý nghĩa như sau:
+- Không chỉ có ba quyền đọc, viết, thực hiện như POSIX, NFSv4 ACLs có 13 quyền cho file và 14 quyền cho thư mục, `các_quyền` là một chuỗi kí tự, mỗi kí tự đại diện cho một quyền có ý nghĩa như sau:
 
 ACE Permissions|Function
 ----------|---------
