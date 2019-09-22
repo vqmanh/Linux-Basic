@@ -1,7 +1,7 @@
 # Tìm hiểu về lệnh GREP trong linux
 
 ## Lệnh grep là gì?
-`Grep` là từ viết tắt của G lobal R egular E xpression P rint.
+`Grep` là từ viết tắt của Global Regular Expression Print.
 
 - Grep là một công cụ dòng lệnh Linux/Unix được sử dụng để tìm kiếm một chuỗi ký tự trong một tệp được chỉ định. Mẫu tìm kiếm văn bản được gọi là biểu thức chính quy. Khi tìm thấy kết quả khớp, nó sẽ in dòng kết quả. Lệnh grep rất tiện lợi khi tìm kiếm thông qua các tệp nhật ký lớn.
 
@@ -58,7 +58,7 @@ Có 3 cú pháp tìm:
 
 - C1: `grep -e "word1" -e "word2" <file>`
 - C2: `grep "word1\|word2" <file>` # `\` để phân biệt word1 với word2
-- C3: `egrep "word1|word2" <file>`
+- C3: `egrep "word1|word2" <file>` = `grep -e "word1|word2" <file>`
 
 <img src=https://imgur.com/ukelNG6.jpg>
 
