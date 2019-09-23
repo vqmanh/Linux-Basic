@@ -3,13 +3,13 @@
 ## Lệnh grep là gì?
 `Grep` là từ viết tắt của Global Regular Expression Print.
 
-- Grep là một công cụ dòng lệnh Linux/Unix được sử dụng để tìm kiếm một chuỗi ký tự trong một tệp được chỉ định. Mẫu tìm kiếm văn bản được gọi là biểu thức chính quy. Khi tìm thấy kết quả khớp, nó sẽ in dòng kết quả. Lệnh grep rất tiện lợi khi tìm kiếm thông qua các tệp nhật ký lớn.
+- Grep là một công cụ dòng lệnh Linux/Unix được sử dụng để tìm kiếm một chuỗi ký tự trong một tệp được chỉ định. Mẫu tìm kiếm văn bản được gọi là biểu thức chính quy. Khi tìm thấy kết quả khớp, nó sẽ in dòng kết quả. Lệnh `grep` rất tiện lợi khi tìm kiếm thông qua các tệp nhật ký lớn.
 
 ## Cách sử dụng
 
 **Cú pháp** `grep [tuỳ chọn] <file>`
 
-### Ví dụ
+### Ví dụ đơn giản
 
 **Mình có 2 file voivang.txt và song.txt**
 
@@ -81,3 +81,23 @@ Các tùy chọn:
 <img src=https://imgur.com/enwwuM4.jpg>
 
 Với `grep` thông thường thì khi tìm "vqmanh" sẽ hiển thị tất cả các dòng chứa "vqmanh" kể cả "vqmanh99". Khi sử dụng tùy chọn `-w' thì sẽ tìm chính xác dòng chỉ chứa "vqmanh" thôi.
+
+### 9: Tìm tất cả các file trên cả thư mục con và thư mục cha với tùy chọn `-R`
+
+- Thêm tùy chọn này các bạn có thể tìm trên thư mục khi không biết chính xác file nào chứa chuỗi cần tìm.
+
+### 10: Kết hợp các tùy chọn
+
+***Để tìm được chính xác cụ thể hơn các bạn có thể kết hợp các tùy chọn lại***
+
+**VD: Tìm "error" hiển thị số dòng, tên file**
+
+` grep -Hin 'error' /var/log/httpd/*`
+
+<img src=https://imgur.com/gXMDKDY.jpg>
+
+Đối với tùy chọn `-Hin` sẽ tìm hết những file có trong thư mục, nếu thư mục đó có thư mục con thì sẽ bỏ qua. Để tìm được rộng hơn cả những file có trong thư mục con, ta sử dụng tùy chọn `rin`
+
+VD: `grep -Rin 'error' /var/log/`
+
+- Tùy chọn này sẽ tìm tất cả những dòng có từ "error" trên tất cả các file kể cả trên thư mục con trên thư mục `log`
