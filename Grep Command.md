@@ -86,7 +86,22 @@ Với `grep` thông thường thì khi tìm "vqmanh" sẽ hiển thị tất c�
 
 - Thêm tùy chọn này các bạn có thể tìm trên thư mục khi không biết chính xác file nào chứa chuỗi cần tìm.
 
-### 10: Kết hợp các tùy chọn
+### 10: Hiển thị thêm dòng trước, sau, xung quanh dòng chứa kết qủa cần tìm.
+
+`grep -<A, B hoặc C> <n> "chuoi" <file>`
+
+Trong đó:
+
+- `A` : hiển thị dòng sau dòng khớp với kí tự cần tìm
+- `B` : hiển thị dòng trước dòng khớp với kí tự cần tìm
+- `C` : hiển thị dòng xung quanh dòng khớp với kí tự cần tìm
+- `n` : là số tự nhiên chỉ định xem hiển thị trước, sau hay xung quang bao nhiêu dòng
+
+VD: 
+<img src=https://imgur.com/nnwtuK4.jpg>
+
+Nếu các bạn muốn tìm rộng hơn thì có thể thay số `n` lớn hơn.
+### 11: Kết hợp các tùy chọn
 
 ***Để tìm được chính xác cụ thể hơn các bạn có thể kết hợp các tùy chọn lại***
 
