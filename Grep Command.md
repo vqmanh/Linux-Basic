@@ -58,7 +58,7 @@ Có 3 cú pháp tìm:
 
 - C1: `grep -e "word1" -e "word2" <file>`
 - C2: `grep "word1\|word2" <file>` # `\` để phân biệt word1 với word2
-- C3: `egrep "word1|word2" <file>` = `grep -e "word1|word2" <file>`
+- C3: `egrep "word1|word2" <file>`
 
 <img src=https://imgur.com/ukelNG6.jpg>
 
